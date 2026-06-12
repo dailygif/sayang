@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Buket Kustom Romantis</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,400&family=Inter:wght@400;500;600&display=swap');
+        
+        body, html { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background: #faf8f6; font-family: 'Inter', sans-serif; }
+        
+        .bq-wrapper { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; display: flex; justify-content: center; align-items: center; background: #faf8f6; z-index: 9999; overflow: hidden; box-sizing: border-box; padding: 20px; transition: background 0.5s ease; }
+        .bq-container { background: #ffffff; border-radius: 20px; padding: 35px 30px; width: 100%; max-width: 420px; max-height: 90vh; box-shadow: 0 20px 60px rgba(128, 0, 32, 0.04); overflow-y: auto; position: relative; z-index: 10; border: 1px solid rgba(128, 0, 32, 0.05); text-align: center; box-sizing: border-box; }
+        
+        /* PROGRESS BAR */
+        .bq-progress-bar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 30px; padding: 0 5px; }
+        .bq-progress-step { width: 22px; height: 22px; border-radius: 50%; background: #f3edea; color: #a39590; display: flex; align-items: center; justify-content: center; font-size: 0.7rem; font-weight: 600; transition: all 0.4s ease; }
+        .bq-active-step { background: #800020 !important; color: #ffffff !important; box-shadow: 0 4px 10px rgba(128,0,32,0.2); }
+        .bq-progress-line { flex-grow: 1; height: 1px; background: #eadeb8; margin: 0 4px; opacity: 0.5; }
+        
+        /* TEXT */
+        .bq-section-title { font-family: 'Cormorant Garamond', serif; font-size: 1.7rem; font-weight: 500; letter-spacing: -0.5px; margin-bottom: 6px; text-align: left; color: #800020; }
+        .bq-subtitle { font-size: 0.8rem; color: #7c726e; margin-bottom: 25px; text-align: left; line-height: 1.4; }
+        
+        /* GRID & ITEMS */
+        .bq-grid-options { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 25px; }
+        .bq-item { border: 1px solid #eee7e4; border-radius: 12px; padding: 8px; cursor: pointer; background: #fdfcfb; transition: all 0.25s ease; box-sizing: border-box; }
+        .bq-item img { width: 100%; height: 80px; object-fit: contain; border-radius: 8px; background: transparent; }
+        .bq-item span { font-size: 0.7rem; font-weight: 500; display: block; margin-top: 6px; color: #5c524f; }
+        .bq-item.bq-selected-item { border-color: #800020 !important; background: #fff6f7 !important; box-shadow: 0 4px 12px rgba(128, 0, 32, 0.05); }
+        .bq-color-preview { width: 100%; height: 45px; border-radius: 8px; margin-bottom: 2px; }
+        
+        /* FIELDS */
+        .bq-input-field, .bq-textarea-field { width: 100%; padding: 14px; border: 1px solid #eae2df; border-radius: 10px; margin-bottom: 14px; font-size: 0.85rem; box-sizing: border-box; background: #fdfcfb; outline: none; transition: all 0.2s; color: #332c2a; }
+        .bq-input-field:focus, .bq-textarea-field:focus { border-color: #800020; background: #ffffff; box-shadow: 0 0 0 3px rgba(128, 0, 32, 0.05); }
+        .bq-textarea-field { height: 100px; resize: none; line-height: 1.5; }
+        
+        /* BUTTONS */
+        .bq-nav-buttons { display: flex; justify-content: space-between; gap: 12px; margin-top: 15px; }
+        .bq-btn { padding: 12px 24px; border: none; border-radius: 50px; font-weight: 500; cursor: pointer; font-size: 0.85rem; transition: all 0.25s ease; box-sizing: border-box; }
+        .bq-back-btn { background: #ffffff; color: #6e6360; width: 48%; border: 1px solid #eae2df; }
+        .bq-next-btn { background: #800020; color: #ffffff; width: 48%; box-shadow: 0 4px 12px rgba(128, 0, 32, 0.15); }
+        .bq-finish-btn { background: #800020; color: #ffffff; width: 100%; padding: 14px; font-size: 0.9rem; border-radius: 50px; border: none; font-weight: 500; cursor: pointer; box-shadow: 0 4px 15px rgba(128, 0, 32, 0.2); transition: all 0.25s; }
+        
+        /* LIVE PREVIEW CANVAS & FINAL CARD */
+        .bq-live-canvas { width: 100%; height: 320px; border-radius: 16px; margin-bottom: 20px; position: relative; overflow: hidden; display: flex; justify-content: center; align-items: center; background: transparent; }
+        .bq-layer-element { width: 100%; height: 100%; object-fit: contain; animation: bqFadeInUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) both; }
+        
+        .bq-letter-card-display { padding: 30px; border-radius: 16px; text-align: left; box-sizing: border-box; width: 100%; background-size: cover; background-position: center; background-repeat: no-repeat; box-shadow: 0 10px 35px rgba(0,0,0,0.03); margin-top: 15px; border: 1px solid rgba(0,0,0,0.03); }
+        #display-to { font-family: 'Cormorant Garamond', serif; font-weight: 600; font-size: 1.4rem; margin-bottom: 14px; }
+        #display-msg { font-family: 'Cormorant Garamond', serif; font-size: 1.15rem; line-height: 1.6; margin-bottom: 20px; min-height: 50px; white-space: pre-wrap; font-style: italic; }
+        #display-from { text-align: right; font-size: 0.75rem; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; }
+        
+        .bq-share-section { margin-top: 20px; background: #fffcfc; padding: 14px; border-radius: 12px; font-size: 0.8rem; word-break: break-all; border: 1px dashed #800020; color: #555; }
+        .bq-hidden { display: none !important; }
+        @keyframes bqFadeInUp { 0% { transform: translateY(15px); opacity: 0; } 100% { transform: translateY(0); opacity: 1; } }
+    </style>
+</head>
+<body>
+
+<div class="bq-wrapper" id="bq-global-wrapper">
+    <div class="bq-container">
+        
+        <div class="bq-progress-bar">
+            <div class="bq-progress-step bq-active-step" id="p-1">1</div>
+            <div class="bq-progress-line"></div>
+            <div class="bq-progress-step" id="p-2">2</div>
+            <div class="bq-progress-line"></div>
+            <div class="bq-progress-step" id="p-3">3</div>
+            <div class="bq-progress-line"></div>
+            <div class="bq-progress-step" id="p-4">4</div>
+            <div class="bq-progress-line"></div>
+            <div class="bq-progress-step" id="p-5">5</div>
+        </div>
+
+        <div id="creator-view">
+            
+            <div id="step-1" class="bq-step-content">
+                <h2 class="bq-section-title">Pilih Gaya Buket</h2>
+                <p class="bq-subtitle">Pilih satu desain buket bunga indah yang sudah jadi.</p>
+                <div class="bq-grid-options" id="bouquet-options"></div>
+                <div class="bq-nav-buttons" style="justify-content: flex-end;">
+                    <button type="button" class="bq-btn bq-next-btn" onclick="showStep(2)">Lanjut →</button>
+                </div>
+            </div>
+
+            <div id="step-2" class="bq-step-content bq-hidden">
+                <h2 class="bq-section-title">Pilih Kertas Surat</h2>
+                <p class="bq-subtitle">Tentukan latar belakang kartu ucapan surat kado ucapan.</p>
+                <div class="bq-grid-options" id="paper-options"></div>
+                <div class="bq-nav-buttons">
+                    <button type="button" class="bq-btn bq-back-btn" onclick="showStep(1)">← Kembali</button>
+                    <button type="button" class="bq-btn bq-next-btn" onclick="showStep(3)">Lanjut →</button>
+                </div>
+            </div>
+
+            <div id="step-3" class="bq-step-content bq-hidden">
+                <h2 class="bq-section-title">Tulis Pesan Suci</h2>
+                <p class="bq-subtitle">Ungkapkan kata-kata tulus yang ingin kamu sampaikan.</p>
+                <input type="text" id="input-to" class="bq-input-field" placeholder="Untuk: Nama Penerima"/>
+                <textarea id="input-message" class="bq-textarea-field" placeholder="Tuliskan pesan manis di sini..."></textarea>
+                <input type="text" id="input-from" class="bq-input-field" placeholder="Dari: Nama Pengirim"/>
+                <div class="bq-nav-buttons">
+                    <button type="button" class="bq-btn bq-back-btn" onclick="showStep(2)">← Kembali</button>
+                    <button type="button" class="bq-btn bq-next-btn" onclick="showStep(4)">Lanjut →</button>
+                </div>
+            </div>
+
+            <div id="step-4" class="bq-step-content bq-hidden">
+                <h2 class="bq-section-title">Suasana Latar</h2>
+                <p class="bq-subtitle">Pilih warna latar belakang halaman saat web dibuka penerima.</p>
+                <div class="bq-grid-options" id="bg-options"></div>
+                <div class="bq-nav-buttons">
+                    <button type="button" class="bq-btn bq-back-btn" onclick="showStep(3)">← Kembali</button>
+                    <button type="button" class="bq-btn bq-next-btn" onclick="jalankanPratinjau()">Lanjut →</button>
+                </div>
+            </div>
+
+            <div id="step-5" class="bq-step-content bq-hidden">
+                <h2 class="bq-section-title">Pratinjau Buket</h2>
+                <p class="bq-subtitle">Berikut adalah tampilan struktur visual sementara buket kamu.</p>
+                <div class="bq-live-canvas" id="creator-preview-canvas"></div>
+                <button type="button" class="bq-btn bq-finish-btn" onclick="buildAndGenerateLink()">Simpan &amp; Salin Tautan</button>
+                <div id="share-output" class="bq-share-section bq-hidden">
+                    <p style="font-weight:600; margin-bottom:8px; color:#800020; font-size:0.85rem;">Tautan Berhasil Dibuat!</p>
+                    <span id="link-text"></span>
+                </div>
+                <br/>
+                <div class="bq-nav-buttons">
+                    <button type="button" class="bq-btn bq-back-btn" onclick="showStep(4)">← Kembali</button>
+                </div>
+            </div>
+
+        </div>
+
+        <div id="receiver-view" class="bq-hidden">
+            <div class="bq-live-canvas" id="canvas-view" style="box-shadow: none; background: transparent;"></div>
+            
+            <div id="letter-card" class="bq-letter-card-display">
+                <div id="display-to"></div>
+                <div id="display-msg"></div>
+                <div id="display-from"></div>
+            </div>
+            <br/><br/>
+            <button type="button" class="bq-btn bq-finish-btn" style="background: rgba(128,0,32,0.1); color: #800020; border: 1px solid rgba(128,0,32,0.2);" onclick="resetToHome()">Buat Buket Kustom Sendiri</button>
+        </div>
+
+    </div>
+</div>
+
+<script type="text/javascript">
+    const ASSET_BOUQUETS = [
+        { id: 'Matahari', name: 'Buket Matahari', img: 'https://cdn.jsdelivr.net/gh/dailygif/sayang@1973fdb946a88f7a662577b64d3be8723c394db2/5E2D91EE-6C5B-4F10-8151-4C0973200D2C.png' },
+        { id: 'Gaya2', name: 'Rustic Tulip', img: 'https://images.unsplash.com/photo-1596436889106-be35e843f974?w=400' },
+        { id: 'Gaya3', name: 'Elegant Rose', img: 'https://images.unsplash.com/photo-1561181286-d3fee7d55364?w=400' }
+    ];
+
+    const ASSET_PAPERS = [
+        { id: 'Classic', name: 'Classic Kraft', hex: '#f4ede2', text: '#5a4a3a', bgImage: '' },
+        { id: 'Pattern', name: 'Premium Pattern', hex: '#ffffff', text: '#222222', bgImage: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=400' },
+        { id: 'SoftPink', name: 'Soft Pink Card', hex: '#fff0f5', text: '#6b4f5b', bgImage: '' },
+        { id: 'Minimalist', name: 'Pure White', hex: '#ffffff', text: '#222222', bgImage: '' }
+    ];
+
+    const ASSET_BACKGROUNDS = [
+        { id: 'Maroon', name: 'Merah Maroon', val: '#800020' },
+        { id: 'White', name: 'Putih Bersih', val: '#ffffff' },
+        { id: 'SoftGrey', name: 'Abu Soft', val: '#faf8f6' }
+    ];
+
+    let userSelection = { bouquet: 'Matahari', paper: 'Classic', to: '', msg: '', from: '', bg: 'Maroon' };
+
+    window.onload = function() {
+        initOptions('bouquet-options', ASSET_BOUQUETS, 'bouquet');
+        initOptions('paper-options', ASSET_PAPERS, 'paper', true); 
+        initOptions('bg-options', ASSET_BACKGROUNDS, 'bg', false, true);
+        checkReceiverMode();
+    };
+
+    function initOptions(containerId, dataset, type, isPaper = false, isBg = false) {
+        const container = document.getElementById(containerId);
+        if(!container) return;
+        container.innerHTML = '';
+        dataset.forEach((item, index) => {
+            let div = document.createElement('div');
+            div.className = 'bq-item ' + (index === 0 ? 'bq-selected-item' : '');
+
+            if (isBg) {
+                div.innerHTML = '<div class="bq-color-preview" style="background:'+item.val+'"></div><span>'+item.name+'</span>';
+            } else if (isPaper) {
+                if(item.bgImage !== '') {
+                    div.innerHTML = '<div class="bq-color-preview" style="background-image:url(\''+item.bgImage+'\'); background-size:cover;"></div><span>'+item.name+'</span>';
+                } else {
+                    div.innerHTML = '<div class="bq-color-preview" style="background:'+item.hex+'; border:1px solid #ddd;"></div><span>'+item.name+'</span>';
+                }
+            } else {
+                div.innerHTML = '<img src="'+item.img+'"/><span>'+item.name+'</span>';
+            }
+            
+            div.onclick = function() {
+                const parent = this.parentElement;
+                parent.querySelectorAll('.bq-item').forEach(el => el.classList.remove('bq-selected-item'));
+                this.classList.add('bq-selected-item');
+                userSelection[type] = item.id;
+            };
+            
+            container.appendChild(div);
+        });
+    }
+
+    function renderSingleBouquet(canvasId, bouquetId) {
+        const canvas = document.getElementById(canvasId);
+        if(!canvas) return;
+        canvas.innerHTML = ''; 
+        const selected = ASSET_BOUQUETS.find(x => x.id === bouquetId) || ASSET_BOUQUETS[0];
+        if(selected) {
+            let imgEl = document.createElement('img');
+            imgEl.src = selected.img;
+            imgEl.className = 'bq-layer-element';
+            canvas.appendChild(imgEl);
+        }
+    }
+
+    function showStep(stepNum) {
+        document.querySelectorAll('.bq-step-content').forEach(el => el.classList.add('bq-hidden'));
+        document.getElementById('step-' + stepNum).classList.remove('bq-hidden');
+        document.querySelectorAll('.bq-progress-step').forEach((el, idx) => {
+            if(idx < stepNum) el.classList.add('bq-active-step');
+            else el.classList.remove('bq-active-step');
+        });
+    }
+
+    function jalankanPratinjau() {
+        renderSingleBouquet('creator-preview-canvas', userSelection.bouquet);
+        showStep(5);
+    }
+
+    function buildAndGenerateLink() {
+        const toVal = document.getElementById('input-to').value || 'Untuk Kamu';
+        const msgVal = document.getElementById('input-message').value || 'Kirim pesan manis...';
+        const fromVal = document.getElementById('input-from').value || 'Dari Seseorang';
+
+        const base = window.location.origin + window.location.pathname;
+        const buildString = 'bq=' + encodeURIComponent(userSelection.bouquet) +
+                            '&pp=' + encodeURIComponent(userSelection.paper) +
+                            '&bg=' + encodeURIComponent(userSelection.bg) +
+                            '&to=' + encodeURIComponent(toVal) +
+                            '&ms=' + encodeURIComponent(msgVal) +
+                            '&fr=' + encodeURIComponent(fromVal);
+
+        const shareUrl = base + '#' + buildString;
+        document.getElementById('link-text').innerText = shareUrl;
+        document.getElementById('share-output').classList.remove('bq-hidden');
+
+        navigator.clipboard.writeText(shareUrl).then(() => {
+            alert('Tautan kado buket berhasil disalin!');
+        });
+    }
+
+    function resetToHome() { 
+        window.location.href = window.location.origin + window.location.pathname; 
+    }
+
+    function checkReceiverMode() {
+        const hashData = window.location.hash;
+        if(hashData && hashData.length > 3) {
+            const cleanHash = hashData.substring(1);
+            const params = new URLSearchParams(cleanHash);
+            
+            if(params.has('bq')) {
+                document.getElementById('creator-view').classList.add('bq-hidden');
+                document.querySelector('.bq-progress-bar').classList.add('bq-hidden');
+                document.getElementById('receiver-view').classList.remove('bq-hidden');
+                
+                // Set Warna Latar Belakang Pilihan Hasil Akhir
+                const targetBg = ASSET_BACKGROUNDS.find(x => x.id === params.get('bg')) || ASSET_BACKGROUNDS[0];
+                document.getElementById('bq-global-wrapper').style.background = targetBg.val;
+
+                // Tampilkan Buket Pilihan
+                renderSingleBouquet('canvas-view', params.get('bq'));
+
+                // Set Kertas Surat Pilihan Hasil Akhir
+                const paperStyle = ASSET_PAPERS.find(x => x.id === params.get('pp')) || ASSET_PAPERS[0];
+                const card = document.getElementById('letter-card');
+                
+                if(paperStyle.bgImage && paperStyle.bgImage !== '') {
+                    card.style.backgroundImage = "url('" + paperStyle.bgImage + "')";
+                    card.style.backgroundColor = 'transparent';
+                } else {
+                    card.style.backgroundImage = 'none';
+                    card.style.backgroundColor = paperStyle.hex;
+                }
+                card.style.color = paperStyle.text;
+
+                // Tampilkan Teks Ucapan Surat
+                document.getElementById('display-to').innerText = params.get('to') || '';
+                document.getElementById('display-msg').innerText = params.get('ms') || '';
+                document.getElementById('display-from').innerText = params.get('fr') || '';
+            }
+        }
+    }
+</script>
+</body>
+</html>
